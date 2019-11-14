@@ -36,7 +36,7 @@ source = {
 }
 
 # Let's see how this looks in the console
-#print(json.dumps(source, indent=4))
+print(json.dumps(source, indent=4))
 
 # End of Source Data Section
 # --------------------------------------------------------------
