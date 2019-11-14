@@ -92,6 +92,7 @@ def precheck():
 	column_count_check = ( len(source['table_A_columns']) == len(source['table_B_columns']) )
 	if not column_count_check:
 		print("Number of columns in both the tables don't match")
+		return False
 
 	# Return the precheck status
 	return (table_A_name_check and table_B_name_check and table_A_column_check and table_B_column_check and primary_check_tableA and primary_check_tableB and column_count_check)
@@ -114,7 +115,7 @@ def count_mismatch(b_col, a_col):
 	return "SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE NOT EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n\tAND B." + b_col + " = A." + a_col + "\n);" 
 
 def display_mismatch(b_col, a_col):
-	return ""
+	return "SELECT * FROM " + source['table_B'] +  " B \nWHERE NOT EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n\tAND B." + b_col + " = A." + a_col + "\n);" 
 
 # Definition of the function generate_queries
 def generate_queries():
@@ -123,6 +124,9 @@ def generate_queries():
 	print("\n")
 	no_of_columns = len(source['table_A_columns'])
 	for i in range(0, no_of_columns):
+		if source['table_B_columns'][i] == source['table_B_primary']:
+			continue
+		
 		print("--Comparison of " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + "\n")
 
 		print("--Number of matches for column " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + " -")
@@ -133,6 +137,7 @@ def generate_queries():
 		print(count_mismatch(source['table_B_columns'][i], source['table_A_columns'][i])) # call of the function count_mismatch
 		print("\n")
 
+		print("--Display record mismatches for column " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + " -")
 		print(display_mismatch(source['table_B_columns'][i], source['table_A_columns'][i])) # call of the function display mismatch
 		print("\n")
 
