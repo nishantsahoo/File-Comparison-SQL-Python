@@ -8,6 +8,8 @@ About this script -
 * n can be any number, it doesn't have to be just 3.
 * The table columns need to be in the right order for the script to be able to generate the correct queries.
 * Note - Please make sure the column mapping is correct.
+* Table A - Table for Application Data
+* Table B - Table for Business Data
 '''
 
 # --------------------------------------------------------------
@@ -19,6 +21,11 @@ import json
 # --------------------------------------------------------------
 # Source Data Section
 # Template Source for Table Name and Table Column values for the two tables to be compared
+
+# IMPORTANT NOTE -
+# table_A -> Application Data
+# table_B -> Business Data
+
 source = {
 	'table_A': 'Table_A',
 	'table_B': 'Table_B',
@@ -92,19 +99,38 @@ def precheck():
 # End of the function definition
 # --------------------------------------------------------------
 
-# Definition of the main function
-def main():
-	precheck_status = precheck() # call of the function precheck
-	if not precheck_status:
-		print('Precheck failed, please read the above log to rectify the source data.')
-	else:
-		print('Precheck passed!')
+
+# Definition of the function query_count_primary
+def query_count_primary():
+	print("\n-- The query below will print the count of records having primary key matched from Business Data (" + source['table_B'] + ") in Application Data (" + source['table_A'] + ")\n")
+	print("SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n);")
+# End of the function definition
+# --------------------------------------------------------------
+
+
+# Definition of the function generate_queries
+def generate_queries():
+	query_count_primary() # call of the function query_count_primary
 
 # End of the function definition
 # --------------------------------------------------------------
 
 
-# End of function definitions
+# Definition of the main function
+def main():
+	precheck_status = precheck() # call of the function precheck
+	if not precheck_status:
+		print('Precheck Status: Precheck failed, please read the above log to rectify the source data.')
+	else:
+		print('Precheck Status: Precheck passed!')
+		print('Start copying SQL queries generated from here onwards -')
+		generate_queries() # call fo the function generate_queries
+
+# End of the function definition
+# --------------------------------------------------------------
+
+
+# End of all function definitions
 # --------------------------------------------------------------
 
 # Main Script
