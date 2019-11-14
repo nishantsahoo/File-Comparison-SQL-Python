@@ -30,9 +30,9 @@ source = {
 	'table_A': 'Table_A',
 	'table_B': 'Table_B',
 	'table_A_primary': 'col_A1',
-	'table_A_columns': ['col_A1', 'col_A2', 'col_A3'],
+	'table_A_columns': ['col_A1', 'col_A2', 'col_A3', 'col_A4', 'col_A5'],
 	'table_B_primary': 'col_B1',
-	'table_B_columns': ['col_B1', 'col_B2', 'col_B3']
+	'table_B_columns': ['col_B1', 'col_B2', 'col_B3', 'col_B4', 'col_B5']
 }
 
 # Let's see how this looks in the console
@@ -101,16 +101,42 @@ def precheck():
 
 
 # Definition of the function query_count_primary
-def query_count_primary():
-	print("\n-- The query below will print the count of records having primary key matched from Business Data (" + source['table_B'] + ") in Application Data (" + source['table_A'] + ")\n")
-	print("SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n);")
+def query_count_primary():	
+	return "SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n);"
+
 # End of the function definition
 # --------------------------------------------------------------
 
+def count_match(b_col, a_col):
+	return "SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n\tAND B." + b_col + " = A." + a_col + "\n);"
+
+def count_mismatch(b_col, a_col):
+	return "SELECT COUNT(*) FROM " + source['table_B'] +  " B \nWHERE NOT EXISTS (\n\tSELECT * FROM " + source['table_A'] + " A\n\tWHERE B." + source['table_B_primary'] + " = A." + source['table_A_primary'] + "\n\tAND B." + b_col + " = A." + a_col + "\n);" 
+
+def display_mismatch(b_col, a_col):
+	return ""
 
 # Definition of the function generate_queries
 def generate_queries():
-	query_count_primary() # call of the function query_count_primary
+	print("\n-- The query below will print the count of records having primary key matched from Business Data (" + source['table_B'] + ") in Application Data (" + source['table_A'] + ")\n")
+	print(query_count_primary()) # call of the function query_count_primary
+	print("\n")
+	no_of_columns = len(source['table_A_columns'])
+	for i in range(0, no_of_columns):
+		print("--Comparison of " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + "\n")
+
+		print("--Number of matches for column " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + " -")
+		print(count_match(source['table_B_columns'][i], source['table_A_columns'][i])) # call of the function count_match
+		print("\n")
+
+		print("--Number of mismatches for column " + source['table_B_columns'][i] + " with " + source['table_A_columns'][i] + " -")
+		print(count_mismatch(source['table_B_columns'][i], source['table_A_columns'][i])) # call of the function count_mismatch
+		print("\n")
+
+		print(display_mismatch(source['table_B_columns'][i], source['table_A_columns'][i])) # call of the function display mismatch
+		print("\n")
+
+# End of generate_queries
 
 # End of the function definition
 # --------------------------------------------------------------
